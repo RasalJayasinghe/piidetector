@@ -237,44 +237,44 @@ export default function ScanPage() {
               </Card>
             ) : (
               <>
-                {/* Side-by-side Image Preview with Labels */}
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <div className="mb-2 text-center text-xs font-semibold text-muted-foreground">Original Image</div>
-                    <Card className="overflow-hidden">
-                      <div className="relative bg-muted/30 w-full flex items-center justify-center min-h-[200px] max-h-[70vh]">
-                        <img src={image || "/placeholder.svg"} alt="Original content" className="w-full h-auto max-h-[70vh] object-contain" id="preview-image-original" />
+                {/* Single Preview Image with Overlays, Border/Shadow, and Highlighted Detections */}
+                <div className="mb-2 text-center text-xs font-semibold text-muted-foreground">Preview Image</div>
+                <Card className="overflow-hidden shadow-lg border-2 border-gray-200">
+                  <div className="relative bg-muted/30 w-full flex items-center justify-center min-h-[300px] max-h-[70vh]">
+                    {/* Only one image is rendered here, overlays are absolutely positioned on top */}
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <img
+                        src={image || "/placeholder.svg"}
+                        alt="Preview content"
+                        className="w-full h-auto max-h-[70vh] object-contain rounded-lg border border-gray-300 shadow-md"
+                        id="preview-image"
+                      />
+                      {/* Overlay bounding boxes if detections exist and highlights are enabled */}
+                      {image && detections.length > 0 && showHighlights && (
+                        <BoundingBoxOverlay
+                          imageUrl={image}
+                          boxes={detections.map((d) => ({
+                            id: d.id,
+                            box: d.boundingBox,
+                            category: d.category,
+                            risk: d.risk,
+                            color: d.risk === "High" ? "#ef4444" : d.risk === "Medium" ? "#f59e42" : "#22c55e",
+                            tooltip: `${d.category} (${Math.round(d.confidence * 100)}%) - ${d.risk} risk`,
+                          }))}
+                          highlightedId={highlightedId}
+                          showHighlights={showHighlights}
+                          onBoxClick={handleBoxClick}
+                        />
+                      )}
+                    </div>
+                    {/* Show detection count badge */}
+                    {detections.length > 0 && (
+                      <div className="absolute top-4 right-4 bg-background/90 backdrop-blur px-3 py-1.5 rounded-md text-sm font-medium z-10 shadow-md border border-gray-200">
+                        {detections.length} detection{detections.length !== 1 ? "s" : ""}
                       </div>
-                    </Card>
+                    )}
                   </div>
-                  <div className="flex-1">
-                    <div className="mb-2 text-center text-xs font-semibold text-muted-foreground">Detections</div>
-                    <Card className="overflow-hidden">
-                      <div className="relative bg-muted/30 w-full flex items-center justify-center min-h-[200px] max-h-[70vh]">
-                        <img src={image || "/placeholder.svg"} alt="Detected content" className="w-full h-auto max-h-[70vh] object-contain" id="preview-image-detected" />
-                        {image && detections.length > 0 && showHighlights && (
-                          <BoundingBoxOverlay
-                            imageUrl={image}
-                            boxes={detections.map((d) => ({
-                              id: d.id,
-                              box: d.boundingBox,
-                              category: d.category,
-                              risk: d.risk,
-                            }))}
-                            highlightedId={highlightedId}
-                            showHighlights={showHighlights}
-                            onBoxClick={handleBoxClick}
-                          />
-                        )}
-                        {detections.length > 0 && (
-                          <div className="absolute top-4 right-4 bg-background/90 backdrop-blur px-3 py-1.5 rounded-md text-sm font-medium z-10">
-                            {detections.length} detection{detections.length !== 1 ? "s" : ""}
-                          </div>
-                        )}
-                      </div>
-                    </Card>
-                  </div>
-                </div>
+                </Card>
                 <div className="p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t bg-card">
                   <div className="flex items-center gap-2 text-sm min-w-0 flex-1">
                     <FileImage className="h-4 w-4 text-muted-foreground shrink-0" />
